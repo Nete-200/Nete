@@ -1,3 +1,4 @@
+
 export const initialBooks = [
   {
     id: 1,
@@ -28,19 +29,7 @@ export const initialBooks = [
   }
 ];
 
-export const initialUsers = [
-  {
-    id: 1,
-    name: "John Smith",
-    membershipId: "LIB001",
-    role: "Member"
-  },
-  {
-    id: 2,
-    name: "Admin User",
-    membershipId: "ADMIN001",
-    role: "Admin"
-  }
-];
+// Start with no users so the first registration can become Admin.
+export const initialUsers = [];
 
 export const initialTransactions = [];

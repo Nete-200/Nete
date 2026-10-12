@@ -1,198 +1,251 @@
+
 import React, { useEffect, useState } from "react";
 
-function BookForm({ books, setBooks, editingBook, setEditingBook }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    author: "",
-    genre: "",
-    isbn: "",
-    quantity: ""
-  });
+const emptyForm = {
+  title: "",
+  author: "",
+  genre: "",
+  isbn: "",
+  quantity: "",
+};
 
+function BookForm({
+  books = [],
+  setBooks,
+  editingBook,
+  setEditingBook,
+  isAdmin = false,
+}) {
+  const [formData, setFormData] = useState({ ...emptyForm });
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (editingBook) {
       setFormData({
-        title: editingBook.title,
-        author: editingBook.author,
-        genre: editingBook.genre,
-        isbn: editingBook.isbn,
-        quantity: editingBook.quantity
+        title: editingBook.title || "",
+        author: editingBook.author || "",
+        genre: editingBook.genre || "",
+        isbn: editingBook.isbn || "",
+        quantity: String(editingBook.quantity ?? ""),
       });
-    } else {
-      setFormData({
-        title: "",
-        author: "",
-        genre: "",
-        isbn: "",
-        quantity: ""
-      });
-    }
 
-    setError("");
+      setError("");
+      setMessage("");
+    } else {
+      setFormData({ ...emptyForm });
+      setError("");
+    }
   }, [editingBook]);
+
+  if (!isAdmin) return null;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
 
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    setError("");
+    setMessage("");
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!isAdmin) {
+      setError("Only an Admin can manage books.");
+      return;
+    }
+
+    const title = formData.title.trim();
+    const author = formData.author.trim();
+    const genre = formData.genre.trim();
+    const isbn = formData.isbn.trim();
+    const quantity = Number(formData.quantity);
 
     if (
-      !formData.title.trim() ||
-      !formData.author.trim() ||
-      !formData.genre.trim() ||
-      !formData.isbn.trim() ||
-      formData.quantity === ""
+      !title ||
+      !author ||
+      !genre ||
+      !isbn ||
+      formData.quantity.trim() === ""
     ) {
       setError("Please complete all fields.");
       return;
     }
 
-    const quantity = Number(formData.quantity);
-
-    if (quantity < 0 || !Number.isInteger(quantity)) {
+    if (!Number.isSafeInteger(quantity) || quantity < 0) {
       setError("Quantity must be a whole number of 0 or more.");
       return;
     }
 
-    if (editingBook) {
-      const updatedBooks = books.map((book) =>
-        book.id === editingBook.id
-          ? {
-              ...book,
-              title: formData.title.trim(),
-              author: formData.author.trim(),
-              genre: formData.genre.trim(),
-              isbn: formData.isbn.trim(),
-              quantity: quantity,
-              available: Math.min(
-                book.available,
-                quantity
-              )
-            }
-          : book
-      );
+    const duplicateISBN = books.some(
+      (book) =>
+        String(book.isbn).trim().toLowerCase() ===
+          isbn.toLowerCase() &&
+        String(book.id) !== String(editingBook?.id)
+    );
 
-      setBooks(updatedBooks);
-      setEditingBook(null);
-    } else {
-      const newBook = {
-        id: Date.now(),
-        title: formData.title.trim(),
-        author: formData.author.trim(),
-        genre: formData.genre.trim(),
-        isbn: formData.isbn.trim(),
-        quantity: quantity,
-        available: quantity
-      };
-
-      setBooks([...books, newBook]);
+    if (duplicateISBN) {
+      setError("A book with this ISBN already exists.");
+      return;
     }
 
-    setFormData({
-      title: "",
-      author: "",
-      genre: "",
-      isbn: "",
-      quantity: ""
-    });
+    if (editingBook) {
+      const oldQuantity = Number(editingBook.quantity ?? 0);
+      const oldAvailable = Number(
+        editingBook.available ?? oldQuantity
+      );
+      const borrowedCount = Math.max(
+        0,
+        oldQuantity - oldAvailable
+      );
 
-    setError("");
+      if (quantity < borrowedCount) {
+        setError(
+          `Quantity cannot be less than the ${borrowedCount} copy/copies currently borrowed.`
+        );
+        return;
+      }
+
+      const updatedBook = {
+        ...editingBook,
+        title,
+        author,
+        genre,
+        isbn,
+        quantity,
+        available: quantity - borrowedCount,
+      };
+
+      setBooks((previousBooks) =>
+        previousBooks.map((book) =>
+          String(book.id) === String(editingBook.id)
+            ? updatedBook
+            : book
+        )
+      );
+
+      setEditingBook(null);
+      setMessage("Book updated successfully.");
+    } else {
+      const newBook = {
+        id: `${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2, 8)}`,
+        title,
+        author,
+        genre,
+        isbn,
+        quantity,
+        available: quantity,
+      };
+
+      setBooks((previousBooks) => [
+        ...previousBooks,
+        newBook,
+      ]);
+
+      setMessage("Book added successfully.");
+    }
+
+    setFormData({ ...emptyForm });
   };
 
   const handleCancel = () => {
     setEditingBook(null);
-
-    setFormData({
-      title: "",
-      author: "",
-      genre: "",
-      isbn: "",
-      quantity: ""
-    });
-
+    setFormData({ ...emptyForm });
     setError("");
+    setMessage("");
   };
 
   return (
-    <div className="form-card">
+    <section className="form-card">
       <h2>{editingBook ? "Update Book" : "Add New Book"}</h2>
 
       {error && (
-        <div className="error-message">
+        <div className="error-message" role="alert">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      {message && (
+        <div className="success-message" role="status">
+          {message}
+        </div>
+      )}
 
+      <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Title</label>
+          <label htmlFor="book-title">Title</label>
           <input
-            type="text"
+            id="book-title"
             name="title"
             value={formData.title}
             onChange={handleChange}
             placeholder="Enter book title"
+            required
           />
         </div>
 
         <div className="form-group">
-          <label>Author</label>
+          <label htmlFor="book-author">Author</label>
           <input
-            type="text"
+            id="book-author"
             name="author"
             value={formData.author}
             onChange={handleChange}
             placeholder="Enter author name"
+            required
           />
         </div>
 
         <div className="form-group">
-          <label>Genre</label>
+          <label htmlFor="book-genre">Genre</label>
           <input
-            type="text"
+            id="book-genre"
             name="genre"
             value={formData.genre}
             onChange={handleChange}
             placeholder="e.g. Fiction"
+            required
           />
         </div>
 
         <div className="form-group">
-          <label>ISBN</label>
+          <label htmlFor="book-isbn">ISBN</label>
           <input
-            type="text"
+            id="book-isbn"
             name="isbn"
             value={formData.isbn}
             onChange={handleChange}
             placeholder="Enter ISBN"
+            required
           />
         </div>
 
         <div className="form-group">
-          <label>Initial Quantity</label>
+          <label htmlFor="book-quantity">Total Quantity</label>
           <input
-            type="number"
+            id="book-quantity"
             name="quantity"
+            type="number"
             min="0"
+            step="1"
             value={formData.quantity}
             onChange={handleChange}
-            placeholder="Enter quantity"
+            required
           />
         </div>
 
         <div className="form-buttons">
           <button type="submit" className="primary-button">
-            {editingBook ? "Update Book" : "Add Book"}
+            {editingBook ? "Save Changes" : "Add Book"}
           </button>
 
           {editingBook && (
@@ -205,9 +258,8 @@ function BookForm({ books, setBooks, editingBook, setEditingBook }) {
             </button>
           )}
         </div>
-
       </form>
-    </div>
+    </section>
   );
 }
 

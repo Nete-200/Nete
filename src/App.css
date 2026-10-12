@@ -7,8 +7,14 @@
   box-sizing: border-box;
 }
 
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: Arial, sans-serif;
   background-color: #f4f6f8;
   background-image: url("https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1600&q=80");
@@ -19,7 +25,24 @@ body {
   color: #1f2937;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 h1 {
+  margin-top: 0;
   margin-bottom: 8px;
 }
 
@@ -31,37 +54,91 @@ p {
   color: #4b5563;
 }
 
+a,
+button,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* =========================
    NAVBAR
 ========================= */
 
 .navbar {
-  background-color: #1f2937;
-  color: white;
+  position: relative;
+  z-index: 1000;
+  width: 100%;
+  min-height: 70px;
   padding: 15px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: #1f2937;
+  color: #ffffff;
 }
 
 .navbar-brand {
   font-size: 22px;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .navbar-links {
   display: flex;
-  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.navbar-links a {
-  color: white;
+/* Navigation links, including React Router NavLink */
+
+.navbar-links a,
+.navbar-links .nav-link {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: #ffffff;
   text-decoration: none;
   font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
-.navbar-links a:hover {
-  text-decoration: underline;
+.navbar-links a:hover,
+.navbar-links .nav-link:hover {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+/* Currently active navigation page */
+
+.navbar-links a.active,
+.navbar-links .nav-link.active {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.navbar-links a:focus-visible,
+.navbar-links .nav-link:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.user-info {
+  margin-left: 8px;
+  color: #e5e7eb;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 /* =========================
@@ -69,14 +146,18 @@ p {
 ========================= */
 
 main {
+  position: relative;
+  z-index: 1;
+  width: 100%;
   max-width: 1200px;
+  min-height: calc(100vh - 70px);
   margin: 0 auto;
   padding: 30px 20px;
-  background-color: rgba(255, 255, 255, 0.95);
-  min-height: calc(100vh - 70px);
+  background-color: rgba(255, 255, 255, 0.96);
 }
 
 .main-content {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 30px;
@@ -98,9 +179,10 @@ main p {
 }
 
 .dashboard-card {
-  background: white;
+  min-width: 0;
   padding: 20px;
   border-radius: 8px;
+  background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -109,9 +191,10 @@ main p {
 }
 
 .dashboard-card p {
+  margin-bottom: 0;
   font-size: 30px;
   font-weight: bold;
-  margin-bottom: 0;
+  overflow-wrap: anywhere;
 }
 
 .low-stock-card {
@@ -125,10 +208,11 @@ main p {
 .table-container {
   width: 100%;
   overflow-x: auto;
-  background-color: #ffffff;
-  border-radius: 12px;
   margin: 20px 0;
+  border-radius: 12px;
+  background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -142,11 +226,10 @@ th,
 td {
   padding: 16px 18px;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
   vertical-align: middle;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-/* Table headings */
 thead th,
 th {
   background-color: #f3f4f6;
@@ -155,7 +238,6 @@ th {
   white-space: nowrap;
 }
 
-/* Table rows */
 tbody tr {
   background-color: #ffffff;
   transition: background-color 0.2s ease;
@@ -165,23 +247,20 @@ tbody tr:hover {
   background-color: #f9fafb;
 }
 
-/* Remove border from the last row */
 tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* Low stock row */
 .low-stock {
   background-color: #fee2e2;
 }
 
-/* Keep low-stock rows distinguishable on hover */
 tbody tr.low-stock:hover {
   background-color: #fecaca;
 }
 
-/* Low stock text */
 .low-stock-text {
+  color: #b91c1c;
   font-weight: bold;
 }
 
@@ -191,11 +270,18 @@ tbody tr.low-stock:hover {
 
 .form-card,
 .list-card {
-  background: white;
-  padding: 25px;
+  width: 100%;
+  min-width: 0;
   margin: 25px 0;
+  padding: 25px;
   border-radius: 8px;
+  background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-card h2,
+.list-card h2 {
+  margin-top: 0;
 }
 
 .form-card form {
@@ -215,29 +301,44 @@ tbody tr.low-stock:hover {
   font-weight: bold;
 }
 
-.form-group input {
+.form-group input,
+.form-group select,
+.form-group textarea {
   width: 100%;
+  min-width: 0;
   padding: 11px;
-  border: 1px solid #ccc;
+  border: 1px solid #d1d5db;
   border-radius: 5px;
+  background-color: #ffffff;
+  color: #1f2937;
   font-size: 15px;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
 /* Dropdowns */
+
 select {
   max-width: 100%;
   padding: 11px;
-  border: 1px solid #ccc;
+  border: 1px solid #d1d5db;
   border-radius: 5px;
-  font-size: 15px;
-  background-color: white;
+  background-color: #ffffff;
   color: #1f2937;
+  font-size: 15px;
 }
 
 select:focus {
@@ -260,33 +361,36 @@ select:focus {
 .secondary-button,
 .edit-button,
 .delete-button {
+  display: inline-block;
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
-  cursor: pointer;
   font-weight: bold;
-  transition: opacity 0.2s ease;
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .primary-button {
   background-color: #2563eb;
-  color: white;
+  color: #ffffff;
 }
 
 .secondary-button {
   background-color: #6b7280;
-  color: white;
+  color: #ffffff;
 }
 
 .edit-button {
-  background-color: #2563eb;
-  color: white;
   margin-right: 6px;
+  background-color: #2563eb;
+  color: #ffffff;
 }
 
 .delete-button {
   background-color: #dc2626;
-  color: white;
+  color: #ffffff;
 }
 
 .primary-button:hover,
@@ -296,24 +400,32 @@ select:focus {
   opacity: 0.85;
 }
 
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.edit-button:focus-visible,
+.delete-button:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
 /* =========================
    MESSAGES
 ========================= */
 
 .error-message {
-  background-color: #fee2e2;
-  color: #991b1b;
+  margin-bottom: 15px;
   padding: 12px;
   border-radius: 5px;
-  margin-bottom: 15px;
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 .success-message {
-  background-color: #dcfce7;
-  color: #166534;
+  margin-top: 15px;
   padding: 12px;
   border-radius: 5px;
-  margin-top: 15px;
+  background-color: #dcfce7;
+  color: #166534;
 }
 
 /* =========================
@@ -321,20 +433,40 @@ select:focus {
 ========================= */
 
 .auth-container {
-  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
   padding: 20px;
 }
 
 .auth-card {
   width: 100%;
   max-width: 450px;
-  background-color: rgba(255, 255, 255, 0.96);
   padding: 25px;
   border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.97);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.auth-card h1,
+.auth-card h2 {
+  margin-top: 0;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-card input,
+.auth-card select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  background-color: #ffffff;
 }
 
 .auth-container p {
@@ -342,24 +474,44 @@ select:focus {
 }
 
 .link-button {
-  background: none;
+  padding: 4px;
   border: none;
+  background: none;
   color: #2563eb;
-  cursor: pointer;
   font-weight: bold;
+  cursor: pointer;
 }
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   LOGOUT BUTTON
+========================= */
 
 .logout-button {
   position: fixed;
   right: 20px;
   bottom: 20px;
+  z-index: 1100;
   padding: 10px 16px;
   border: none;
   border-radius: 5px;
   background-color: #dc2626;
-  color: white;
+  color: #ffffff;
   font-weight: bold;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.logout-button:hover {
+  background-color: #b91c1c;
+}
+
+.logout-button:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 3px;
 }
 
 /* =========================
@@ -370,6 +522,18 @@ select:focus {
   .dashboard-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .navbar {
+    padding: 15px 20px;
+  }
+
+  .navbar-links {
+    gap: 8px;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
 }
 
 /* =========================
@@ -377,24 +541,48 @@ select:focus {
 ========================= */
 
 @media (max-width: 700px) {
+  body {
+    background-attachment: scroll;
+  }
+
   .navbar {
     flex-direction: column;
-    gap: 15px;
-    padding: 15px 20px;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px;
+  }
+
+  .navbar-brand {
+    font-size: 20px;
+    text-align: center;
+    white-space: normal;
   }
 
   .navbar-links {
-    flex-wrap: wrap;
+    width: 100%;
     justify-content: center;
-    gap: 15px;
+    gap: 6px;
+  }
+
+  .navbar-links a,
+  .navbar-links .nav-link {
+    padding: 8px 9px;
+    font-size: 14px;
+  }
+
+  .user-info {
+    width: 100%;
+    margin: 5px 0 0;
+    text-align: center;
+    white-space: normal;
   }
 
   main {
-    padding: 20px 10px;
+    padding: 20px 12px;
   }
 
   .main-content {
-    padding: 20px 10px;
+    padding: 20px 12px;
   }
 
   .form-card,
@@ -407,19 +595,55 @@ select:focus {
   }
 
   .form-buttons {
-    grid-column: auto;
+    grid-column: 1;
   }
 
   .dashboard-cards {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .dashboard-card p {
+    font-size: 26px;
   }
 
   table {
+    min-width: 600px;
     font-size: 14px;
   }
 
   th,
   td {
     padding: 12px 10px;
+  }
+
+  .logout-button {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+/* =========================
+   SMALL MOBILE SCREENS
+========================= */
+
+@media (max-width: 380px) {
+  .navbar-links {
+    gap: 4px;
+  }
+
+  .navbar-links a,
+  .navbar-links .nav-link {
+    padding: 7px;
+    font-size: 12px;
+  }
+
+  .form-card,
+  .list-card {
+    padding: 14px;
+  }
+
+  .auth-card {
+    padding: 18px;
   }
 }

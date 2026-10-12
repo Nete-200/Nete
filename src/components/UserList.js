@@ -1,16 +1,12 @@
+
 import React from "react";
 
-function UserList({ users, onEdit, onDelete }) {
-  const handleDelete = (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this user?"
-    );
-
-    if (confirmed) {
-      onDelete(id);
-    }
-  };
-
+function UserList({
+  users = [],
+  onEdit,
+  onDelete,
+  isAdmin = false,
+}) {
   return (
     <div className="list-card">
       <h2>Library Users</h2>
@@ -25,7 +21,7 @@ function UserList({ users, onEdit, onDelete }) {
                 <th>Name</th>
                 <th>Membership ID</th>
                 <th>Role</th>
-                <th>Actions</th>
+                {isAdmin && <th>Actions</th>}
               </tr>
             </thead>
 
@@ -35,21 +31,26 @@ function UserList({ users, onEdit, onDelete }) {
                   <td>{user.name}</td>
                   <td>{user.membershipId}</td>
                   <td>{user.role}</td>
-                  <td>
-                    <button
-                      className="edit-button"
-                      onClick={() => onEdit(user)}
-                    >
-                      Update
-                    </button>
 
-                    <button
-                      className="delete-button"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+                  {isAdmin && (
+                    <td>
+                      <button
+                        type="button"
+                        className="edit-button"
+                        onClick={() => onEdit?.(user)}
+                      >
+                        Update
+                      </button>
+
+                      <button
+                        type="button"
+                        className="delete-button"
+                        onClick={() => onDelete?.(user.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

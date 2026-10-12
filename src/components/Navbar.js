@@ -1,7 +1,11 @@
+
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Navbar({ loggedInUser }) {
+  const getLinkClass = ({ isActive }) =>
+    isActive ? "nav-link active" : "nav-link";
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -9,14 +13,27 @@ function Navbar({ loggedInUser }) {
       </div>
 
       <div className="navbar-links">
-        <Link to="/">Dashboard</Link>
-        <Link to="/books">Books</Link>
-        <Link to="/transactions">Transactions</Link>
-        <Link to="/users">Users</Link>
+        <NavLink to="/" end className={getLinkClass}>
+          Dashboard
+        </NavLink>
 
-        <span className="user-info">
-          {loggedInUser.name} ({loggedInUser.role})
-        </span>
+        <NavLink to="/books" className={getLinkClass}>
+          Books
+        </NavLink>
+
+        <NavLink to="/transactions" className={getLinkClass}>
+          Transactions
+        </NavLink>
+
+        <NavLink to="/users" className={getLinkClass}>
+          Users
+        </NavLink>
+
+        {loggedInUser && (
+          <span className="user-info">
+            {loggedInUser.name} ({loggedInUser.role})
+          </span>
+        )}
       </div>
     </nav>
   );

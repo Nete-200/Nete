@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 
 function useLocalStorage(key, initialValue) {
@@ -5,7 +6,7 @@ function useLocalStorage(key, initialValue) {
     try {
       const savedValue = localStorage.getItem(key);
 
-      return savedValue
+      return savedValue !== null
         ? JSON.parse(savedValue)
         : initialValue;
     } catch (error) {

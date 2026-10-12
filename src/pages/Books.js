@@ -1,47 +1,60 @@
-import React, { useState } from "react";
 
+
+import React, { useState } from "react";
 import BookForm from "../components/BookForm";
 import BookList from "../components/BookList";
 
-function Books({ books, setBooks }) {
+function Books({ books = [], setBooks, loggedInUser }) {
   const [editingBook, setEditingBook] = useState(null);
 
+  const isAdmin =
+    String(loggedInUser?.role || "").toLowerCase() === "admin";
+
   const handleEdit = (book) => {
+    if (!isAdmin) return;
+
     setEditingBook(book);
+
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: "smooth",
     });
   };
 
   const handleDelete = (id) => {
-    setBooks(
-      books.filter((book) => book.id !== id)
+    if (!isAdmin) return;
+
+    setBooks((currentBooks) =>
+      currentBooks.filter(
+        (book) => String(book.id) !== String(id)
+      )
     );
 
-    if (editingBook?.id === id) {
-      setEditingBook(null);
-    }
+    setEditingBook((current) =>
+      current && String(current.id) === String(id)
+        ? null
+        : current
+    );
   };
 
   return (
     <div>
       <h1>Book Management</h1>
+      <p>View the community library collection.</p>
 
-      <p>
-        Add, update and remove books from the
-        community library.
-      </p>
-
-      <BookForm
-        books={books}
-        setBooks={setBooks}
-        editingBook={editingBook}
-        setEditingBook={setEditingBook}
-      />
+      {isAdmin && (
+        <BookForm
+          books={books}
+          setBooks={setBooks}
+          editingBook={editingBook}
+          setEditingBook={setEditingBook}
+          isAdmin={isAdmin}
+        />
+      )}
 
       <BookList
         books={books}
+        isAdmin={isAdmin}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
@@ -50,3 +63,5 @@ function Books({ books, setBooks }) {
 }
 
 export default Books;
+
+
