@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Nete/static/css/main.d64e53da.css",
+    "main.js": "/Nete/static/js/main.e3695192.js",
+    "static/js/453.24ecb766.chunk.js": "/Nete/static/js/453.24ecb766.chunk.js",
+    "index.html": "/Nete/index.html",
+    "main.d64e53da.css.map": "/Nete/static/css/main.d64e53da.css.map",
+    "main.e3695192.js.map": "/Nete/static/js/main.e3695192.js.map",
+    "453.24ecb766.chunk.js.map": "/Nete/static/js/453.24ecb766.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d64e53da.css",
+    "static/js/main.e3695192.js"
+  ]
+}
